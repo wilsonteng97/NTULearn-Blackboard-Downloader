@@ -185,6 +185,8 @@ while True:
         except:
             skip = True
             print("[!INFO] No content to download.\n")
+            driver.switch_to.window(driver.window_handles[0])
+            driver.get(mainCourseLink)
 
         if (not skip):    
             soup = BeautifulSoup(driver.page_source,features="lxml")
@@ -212,7 +214,7 @@ while True:
 
             print("--------------------------------")
             print(f"[!INFO] Download finished for [{course}]\n")
-
+            time.sleep(2)
             driver.switch_to.window(driver.window_handles[0])
             driver.get(mainCourseLink)
     # print(ContentNamesList)
