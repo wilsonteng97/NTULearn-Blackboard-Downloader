@@ -19,10 +19,12 @@ username = "WTENG002@student.main.ntu.edu.sg"
 password = ""
 CHUNK_SIZE = 1024 * 1024 # 1MB
 
+NEWLY_DOWNLOADED_FILES = []
+
 options = Options()
 options.add_argument("--headless")
 options.add_argument('user-agent="Mozilla/5.0 (iPod; U; CPU iPhone OS 2_1 like Mac OS X; ja-jp) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5F137 Safari/525.20"')
-driver = webdriver.Chrome(r'C:\Users\wilso\OneDrive\Desktop\chromedriver.exe', options=options)
+driver = webdriver.Chrome(r'C:\Users\wilso\\Documents\chromedriver.exe', options=options)
 driver.set_window_size(3000, 3000)
 
 CWD = os.getcwd()
@@ -45,14 +47,15 @@ def print_level(level):
 def download_file(url, save_dir):
     save_dir = save_dir.replace(":", "")
     if pathlib.Path(save_dir).is_file():
-        print("[!File exist]")
-        return
+        print("[!file-exist]")
+        return (False, save_dir)
     if not os.path.exists(os.path.dirname(save_dir)):
         os.makedirs(os.path.dirname(save_dir))
     with requests_session.get(url, stream=True) as response:
         with open(save_dir, 'wb') as handle:
             for data in tqdm(response.iter_content(chunk_size=CHUNK_SIZE)): # 1MB
                 handle.write(data)
+    return (True, save_dir)
 
 def navigate_folder(href, folder_name, path_name, level=1):
     curr_url = driver.current_url
@@ -82,7 +85,8 @@ def navigate_folder(href, folder_name, path_name, level=1):
                 # is file
                 print_level(level)
                 print(f"{index + 1}) {name} ")
-                download_file(url, os.path.join(path_name, folder_name, name))
+                success = download_file(url, os.path.join(path_name, folder_name, name))
+                if (success[0]): NEWLY_DOWNLOADED_FILES.append(success[1])
     driver.get(curr_url)
 
 
@@ -130,6 +134,7 @@ while True:
 
 while True:
     courseLst = []
+    NEWLY_DOWNLOADED_FILES = []
 
     for div in mydivs:
         soup = BeautifulSoup(str(div),features="lxml")
@@ -210,13 +215,20 @@ while True:
                         navigate_folder(url, name, course.replace(":", ""))
                     elif "/bbcswebdav/" in child['href']:
                         # is file
-                        download_file(url, os.path.join(course, str(name)).replace(":", ""))
+                        success = download_file(url, os.path.join(course, str(name)).replace(":", ""))
+                        if (success[0]): NEWLY_DOWNLOADED_FILES.append(success[1])
 
             print("--------------------------------")
             print(f"[!INFO] Download finished for [{course}]\n")
             time.sleep(2)
             driver.switch_to.window(driver.window_handles[0])
             driver.get(mainCourseLink)
+
+    if NEWLY_DOWNLOADED_FILES:
+        print(f"\n================= New Files ({len(NEWLY_DOWNLOADED_FILES)}) =================")
+        print(*NEWLY_DOWNLOADED_FILES, sep="\n")
+        print()
+
     # print(ContentNamesList)
 
     # userContinueChoice = input("Do u want to download more files? \nPress y to continue, press any other key to quit\n")
