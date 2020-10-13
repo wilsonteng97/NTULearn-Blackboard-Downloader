@@ -195,7 +195,13 @@ while True:
 
         if (not skip):    
             soup = BeautifulSoup(driver.page_source,features="lxml")
-            containerHTML = soup.findAll("ul", {"class": "contentList"})[0]
+            containerHTML = soup.findAll("ul", {"class": "contentList"})
+            if len(containerHTML) == 0: 
+                print("[!INFO] No content to download.\n")
+                driver.switch_to.window(driver.window_handles[0])
+                driver.get(mainCourseLink)
+                continue
+            containerHTML = containerHTML[0]
             anonymous_elements = re.findall("anonymous_element_\d+",str(containerHTML))
             print("\n")
             print("      List of Content      ")
