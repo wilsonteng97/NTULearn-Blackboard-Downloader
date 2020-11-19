@@ -188,10 +188,23 @@ while True:
             time.sleep(1)
             # driver.implicitly_wait(2)
         except:
-            skip = True
-            print("[!INFO] No content to download.\n")
-            driver.switch_to.window(driver.window_handles[0])
-            driver.get(mainCourseLink)
+            try:
+                print("[!INFO] 'Content' match failed. Trying for 'material' match...")
+                driver.switch_to.window(driver.window_handles[0])
+                driver.get(mainCourseLink)
+                element = driver.find_element_by_link_text(course)
+                driver.execute_script("arguments[0].click();", element)
+                time.sleep(1)
+                
+                element = driver.find_element_by_partial_link_text("material")
+                driver.execute_script("arguments[0].click();", element)
+                time.sleep(1)
+                # driver.implicitly_wait(2)
+            except:
+                skip = True
+                print("[!INFO] No content to download.\n")
+                driver.switch_to.window(driver.window_handles[0])
+                driver.get(mainCourseLink)
 
         if (not skip):    
             soup = BeautifulSoup(driver.page_source,features="lxml")
