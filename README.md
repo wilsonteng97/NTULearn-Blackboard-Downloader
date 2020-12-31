@@ -1,5 +1,5 @@
-# NTULearn-Lecture-Video-Downloader
-This script helps to download NTU Lecture Video in a convenient way. This script will start by asking for ntulearn username and password. Using the information, it will show all the current modules you are taking and you can select any one of them to start downloading. 
+# NTULearn-Blackboard-Downloader
+This repository helps to download NTU content from NTULearn in a conveniently. This script will start by asking for ntulearn username and password. Using the information, it will show all the current modules you are taking and you can select any one of them to start downloading. 
 </br></br></br>
 ## Below are some dependencies to install before running: 
 Run these line by line in terminal or command prompt. 
@@ -21,7 +21,7 @@ cd Desktop
 Next, to run the file, simply type the following line:
 
 ```
-python3 NTULectureVideoDownloaderConsoleApp.py 
+python3 NTUContentDownloaderConsoleApp.py 
 ```
 </br>
 
@@ -46,7 +46,7 @@ In this section, replace the None values with your actual credentials informatio
 
 #Enter Credentials information here
 
-username = 'sweesenkoh@student.main.ntu.edu.sg'
+username = 'WTENG002@student.main.ntu.edu.sg'
 password = 'MyAmazingPassword'
 
 ##
