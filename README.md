@@ -1,5 +1,12 @@
 # NTULearn-Blackboard-Downloader
-This repository helps to download NTU content from NTULearn in a conveniently. This script will start by asking for ntulearn username and password. Using the information, it will show all the current modules you are taking and you can select any one of them to start downloading. 
+This repository helps to download NTU content from NTULearn in a conveniently. This repository contains 2 scripts:
+- NTUContentDownloaderConsoleApp.py (Downloads course materials)
+- NTULectureVideoDownloaderConsoleApp.py (Downloads lecture videos)
+
+Both scripts will start by asking for ntulearn username and password. Using the information, it will display all the registered modules. Simply select any one of the courses to begin downloading your files (ppt, pdf, etc). 
+
+Note: development for the lecture video downloader script has been discontinued due to unstandardised platforms used by different professors (E.g. BBcollaborate, Zoom, etc).
+
 </br></br></br>
 ## Below are some dependencies to install before running: 
 Run these line by line in terminal or command prompt. 
