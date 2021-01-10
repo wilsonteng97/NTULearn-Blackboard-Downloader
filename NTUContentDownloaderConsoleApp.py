@@ -25,7 +25,8 @@ CHUNK_SIZE = 1024 * 1024 # 1MB
 
 # Keywords to access
 KEYWORDS_MAIN = ['Content', 'material']
-KEYWORDS_SIDEBAR_FOLDERS = ['Lecture Slides', 'Tutorials', 'Labs', 'eLearning Week', 'Additional Material', 'Top10MainCausesofFailures']
+KEYWORDS_SIDEBAR_FOLDERS = ['Lecture Slides', 'Tutorials', 'Labs', 'eLearning Week', 'Additional Material', 'Top10MainCausesofFailures',
+                            'Information', 'Assignments', 'Endnote']
 
 # Chromedriver options
 options = Options()
@@ -50,6 +51,9 @@ def print_level(level):
         for _ in range(level-1):
             print("._", end="")
         print(" ", end="")
+
+def clean_file_name(name):
+    return name.replace("\\", "-").replace("/", "-")
 
 def download_file(url, save_dir):
     save_dir = save_dir.replace(":", "").replace("?", "")
@@ -84,7 +88,12 @@ def download_folder(href, folder_name, path_name, level=1):
     driver.get(href)
 
     soup = BeautifulSoup(driver.page_source,features="lxml")
-    containerHTML = soup.findAll("ul", {"class": "contentList"})[0]
+    containerHTML_ls = soup.findAll("ul", {"class": "contentList"})
+    if len(containerHTML_ls) == 0: 
+        print(f"[!INFO] No content to download in '{folder_name}'.\n")
+        driver.get(curr_url)
+        return
+    containerHTML = containerHTML_ls[0]
     anonymous_elements = re.findall("anonymous_element_\d+",str(containerHTML))
     ContentNames = BeautifulSoup(str(containerHTML),features="lxml").find("ul").findAll("li", recursive=False)
     print("Parent Length : ", len(ContentNames))
@@ -107,7 +116,7 @@ def download_folder(href, folder_name, path_name, level=1):
                 # is file
                 print_level(level)
                 print(f"{index + 1}) {name} ")
-                success = download_file(url, os.path.join(path_name, folder_name, name))
+                success = download_file(url, os.path.join(path_name, folder_name, clean_file_name(name)))
                 if (success[0]): NEWLY_DOWNLOADED_FILES.append(success[1])
     driver.get(curr_url)
 
@@ -115,13 +124,13 @@ def access_and_download_files(keyword, base_path):
     element = driver.find_element_by_partial_link_text(keyword)
     driver.execute_script("arguments[0].click();", element)
     soup = BeautifulSoup(driver.page_source,features="lxml")
-    containerHTML = soup.findAll("ul", {"class": "contentList"})
-    if len(containerHTML) == 0: 
+    containerHTML_ls = soup.findAll("ul", {"class": "contentList"})
+    if len(containerHTML_ls) == 0: 
         print("[!INFO] No content to download.\n")
         driver.switch_to.window(driver.window_handles[0])
         driver.get(mainCourseLink)
         return
-    containerHTML = containerHTML[0]
+    containerHTML = containerHTML_ls[0]
     anonymous_elements = re.findall("anonymous_element_\d+",str(containerHTML))
     print("\n")
     print("      List of Content      ")
@@ -141,7 +150,7 @@ def access_and_download_files(keyword, base_path):
                 download_folder(url, name, base_path)
             elif "/bbcswebdav/" in child['href']:
                 # is file
-                success = download_file(url, os.path.join(base_path, str(name)))
+                success = download_file(url, os.path.join(base_path, clean_file_name(str(name))))
                 if (success[0]): NEWLY_DOWNLOADED_FILES.append(success[1])
 
     driver.switch_to.window(driver.window_handles[0])
