@@ -18,8 +18,8 @@ password = ""
 
 options = Options()
 options.add_argument("--headless")
-# options.add_argument('user-agent="Mozilla/5.0 (iPod; U; CPU iPhone OS 2_1 like Mac OS X; ja-jp) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5F137 Safari/525.20"')
-driver = webdriver.Chrome(r'C:\Users\wilso\OneDrive\Desktop\chromedriver.exe', options=options)
+options.add_argument('user-agent="Mozilla/5.0 (iPod; U; CPU iPhone OS 2_1 like Mac OS X; ja-jp) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5F137 Safari/525.20"')
+driver = webdriver.Chrome(r'C:\Users\wilso\\Documents\chromedriver.exe', options=options)
 driver.set_window_size(3000, 3000)
 
 
@@ -65,11 +65,16 @@ while True:
     print("\n Loading... \n\n")
 
     driver.get("https://ntulearn.ntu.edu.sg/webapps/login/")
+    time.sleep(1)
     driver.find_element_by_id("userNameInput").send_keys(username)
     driver.find_element_by_id("passwordInput").send_keys(password)
     driver.find_element_by_id("submitButton").click()
     driver.implicitly_wait(2)
-    driver.find_element_by_id("agree_button").click()
+    try:
+        driver.find_element_by_id("agree_button").click()
+    except:
+        pass
+    
     html = driver.execute_script("return document.getElementsByTagName('html')[0].innerHTML")
     time.sleep(2)
     lst = re.findall("termCourses",driver.page_source)
