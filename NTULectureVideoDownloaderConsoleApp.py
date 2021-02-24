@@ -1,13 +1,14 @@
-from selenium import webdriver #
-import time
-from selenium.webdriver.chrome.options import Options
-import re
 import getpass
-from bs4 import BeautifulSoup
-import urllib.request
+import os
+import pathlib
+import re
 import ssl
+import time
+import urllib.request
 
-
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 #Enter Credentials information here
 
@@ -22,6 +23,7 @@ options.add_argument('user-agent="Mozilla/5.0 (iPod; U; CPU iPhone OS 2_1 like M
 driver = webdriver.Chrome(r'C:\Users\wilso\\Documents\chromedriver.exe', options=options)
 driver.set_window_size(3000, 3000)
 
+CWD = os.getcwd()
 
 def show_progress(block_num, block_size, total_size):
     downloaded = block_num * block_size
@@ -106,10 +108,12 @@ while True:
             # title = re.findall(">(.*)<",str(title))
             titleLst.append([title])
 
-    print("Welcome to NTU Lecture Video Downloader")
+    print(f"Welcome to NTU Lecture Content Downloader (CWD : '{CWD}')")
     print("\n Please Select the Subject: ")
+    titleNamesLst = []
     for (index,item) in enumerate(titleLst):
         print(str(index + 1) + ") " + item[0])
+        titleNamesLst.append(item[0])
 
   
     print("\n\n")
@@ -120,7 +124,7 @@ while True:
             userChoiceInt = int(userChoice)
             if (userChoiceInt <= 0 or userChoiceInt > len(titleLst)):
                 raise IndexError
-            userChoiceTitle = str(titleLst[userChoiceInt - 1][0])
+            userChoiceTitle = str(titleLst[userChoiceInt - 1][0]).replace(":", "").replace("?", "")
             print(userChoiceTitle)
             
             if ("LEC" not in userChoiceTitle):
@@ -238,11 +242,12 @@ while True:
             print("\n\n")
             driver.switch_to.window(driver.window_handles[0])
             index = (lectureIndexChoice - 1 ) if (onlyOneVideo) else x
-            element = driver.find_element_by_link_text(str(lectureNamesList[index]))
+            currLectureName = str(lectureNamesList[index])
+            element = driver.find_element_by_link_text(currLectureName)
             driver.execute_script("arguments[0].click();", element)
 
             if (onlyOneVideo == False):
-                print("Downloading video " + str(index + 1) + ": " + str(lectureNamesList[index]) + "\n")
+                print("Downloading video " + str(index + 1) + ": " + currLectureName + "\n")
             # driver.implicitly_wait(10)
             # driver.find_element_by_id(str(anonymous_elements[lectureIndexChoice-1])).click()
             re.findall('http.*mp4', driver.page_source)
@@ -257,7 +262,14 @@ while True:
 
             ssl._create_default_https_context = ssl._create_unverified_context
 
-            urllib.request.urlretrieve(rls[0], str(lectureNamesList[index]) + ".mp4",show_progress)
+            video_name = currLectureName + ".mp4"
+            video_pth = os.path.join(CWD, userChoiceTitle, video_name)
+            
+            if pathlib.Path(video_pth).is_file():
+                print(f"[!file-exist] {video_pth}")
+                continue
+
+            urllib.request.urlretrieve(rls[0], video_pth, show_progress)
             print("\nSuccessfully downloaded!")
 
             if (onlyOneVideo):
