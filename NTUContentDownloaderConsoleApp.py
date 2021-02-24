@@ -26,7 +26,7 @@ CHUNK_SIZE = 1024 * 1024 # 1MB
 # Keywords to access
 KEYWORDS_MAIN = ['Content', 'material']
 KEYWORDS_SIDEBAR_FOLDERS = ['Lecture Slides', 'Tutorials', 'Labs', 'eLearning Week', 'Additional Material', 'Top10MainCausesofFailures',
-                            'Information', 'Assignments', 'Endnote']
+                            'Assignments', 'Endnote']
 
 # Chromedriver options
 options = Options()
@@ -122,6 +122,7 @@ def download_folder(href, folder_name, path_name, level=1):
 
 def access_and_download_files(keyword, base_path):
     element = driver.find_element_by_partial_link_text(keyword)
+    time.sleep(5)
     driver.execute_script("arguments[0].click();", element)
     soup = BeautifulSoup(driver.page_source,features="lxml")
     containerHTML_ls = soup.findAll("ul", {"class": "contentList"})
@@ -145,7 +146,7 @@ def access_and_download_files(keyword, base_path):
             print(f"{index + 1}) {name} ")
             ContentNamesList.append(name)
             url = check_url(child['href'])
-            if "/webapps/blackboard/content/listContent.jsp" in child['href']:
+            if ("/webapps/blackboard/content/listContent.jsp" in child['href']) or ("/webapps/blackboard/content/listContentEditable.jsp" in child['href']):
                 # is folder
                 download_folder(url, name, base_path)
             elif "/bbcswebdav/" in child['href']:
