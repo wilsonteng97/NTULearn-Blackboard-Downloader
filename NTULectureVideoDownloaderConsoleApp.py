@@ -246,6 +246,13 @@ while True:
             element = driver.find_element_by_link_text(currLectureName)
             driver.execute_script("arguments[0].click();", element)
 
+            video_name = currLectureName + ".mp4"
+            video_pth = os.path.join(CWD, userChoiceTitle, video_name)
+            
+            if pathlib.Path(video_pth).is_file():
+                print(f"[!file-exist] {video_pth}")
+                continue
+
             if (onlyOneVideo == False):
                 print("Downloading video " + str(index + 1) + ": " + currLectureName + "\n")
             # driver.implicitly_wait(10)
@@ -261,13 +268,6 @@ while True:
             driver.close()
 
             ssl._create_default_https_context = ssl._create_unverified_context
-
-            video_name = currLectureName + ".mp4"
-            video_pth = os.path.join(CWD, userChoiceTitle, video_name)
-            
-            if pathlib.Path(video_pth).is_file():
-                print(f"[!file-exist] {video_pth}")
-                continue
 
             urllib.request.urlretrieve(rls[0], video_pth, show_progress)
             print("\nSuccessfully downloaded!")
